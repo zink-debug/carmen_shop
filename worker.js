@@ -24,6 +24,7 @@ async function handleOrder(request, env) {
   catch { return err('Invalid JSON', 400); }
 
   const { category, name, email, room, notes = '', size, payment, delivery, total } = body;
+  const amount = Math.max(1, parseInt(body.amount) || 1);
 
   if (!name || !email || !room) return err('Missing required fields', 400);
   if (!['12 oz','16 oz','20 oz'].includes(size)) return err('Invalid size', 400);
@@ -42,14 +43,14 @@ async function handleOrder(request, env) {
 
   try {
     const result = await env.DB.prepare(
-      `INSERT INTO orders (name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, total, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
+      `INSERT INTO orders (name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, amount, total, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
        RETURNING id`
     )
     .bind(
       name, email, room, notes, item, category, size, temp, milk,
       JSON.stringify(syrups), JSON.stringify(extras),
-      payment, delivery, Math.round(total * 100) / 100
+      payment, delivery, amount, Math.round(total * 100) / 100
     )
     .first();
 
@@ -67,7 +68,7 @@ async function handleOrder(request, env) {
 async function handleGetOrders(env) {
   try {
     const { results } = await env.DB.prepare(
-      `SELECT id, name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, total, status, created_at
+      `SELECT id, name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, amount, total, status, created_at
        FROM orders ORDER BY created_at DESC LIMIT 200`
     ).all();
 

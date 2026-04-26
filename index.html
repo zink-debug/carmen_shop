@@ -544,8 +544,8 @@
           </div>
         </div>
         <div>
-          <div class="option-group-label">Amount <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="coffee-amount" type="number" min="0" step="0.01" placeholder="0.00" style="margin-top:0.1rem">
+          <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
+          <input class="field-input" id="coffee-amount" type="number" min="1" step="1" placeholder="1" style="margin-top:0.1rem">
         </div>
       </div>
     </div>
@@ -641,8 +641,8 @@
           </div>
         </div>
         <div>
-          <div class="option-group-label">Order Amount <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="tea-amount" type="number" min="0" step="0.01" placeholder="0.00" style="margin-top:0.1rem">
+          <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
+          <input class="field-input" id="tea-amount" type="number" min="1" step="1" placeholder="1" style="margin-top:0.1rem">
         </div>
       </div>
     </div>
@@ -724,8 +724,8 @@
           </div>
         </div>
         <div>
-          <div class="option-group-label">Amount <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="juice-amount" type="number" min="0" step="0.01" placeholder="0.00" style="margin-top:0.1rem">
+          <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
+          <input class="field-input" id="juice-amount" type="number" min="1" step="1" placeholder="1" style="margin-top:0.1rem">
         </div>
       </div>
     </div>
@@ -822,10 +822,8 @@
       if (size) lines.push(['Size', size.value]);
       if (temp) lines.push(['Temp', temp.value]);
 
-      showSummary('Coffee', base, addons, addonNames, lines, size !== null);
-
-      // auto-fill amount
-      syncAmount('coffee-amount', base + addons);
+      const qty = Math.max(1, parseInt(document.getElementById('coffee-amount').value) || 1);
+      showSummary('Coffee', base, addons, qty, addonNames, lines, size !== null);
 
     } else if (p === 'tea') {
       const teas = [...document.querySelectorAll('#page-tea input[id^="tt-"]:checked')];
@@ -848,8 +846,8 @@
 
       if (size) lines.push(['Size', size.value]);
 
-      showSummary(drinkLabel, baseWithSize, addons, addonNames, lines, teas.length > 0 && size !== null);
-      syncAmount('tea-amount', baseWithSize + addons);
+      const qty = Math.max(1, parseInt(document.getElementById('tea-amount').value) || 1);
+      showSummary(drinkLabel, baseWithSize, addons, qty, addonNames, lines, teas.length > 0 && size !== null);
 
     } else if (p === 'juice') {
       const drink = document.querySelector('input[name="juice-drink"]:checked');
@@ -859,12 +857,12 @@
       if (drink) base = (JUICE_BASE[drink.value] || 2.00) + sizeUpcharge;
       if (size) lines.push(['Size', size.value]);
 
-      showSummary(drink ? drink.value : 'Juice', base, 0, [], lines, drink !== null && size !== null);
-      syncAmount('juice-amount', base);
+      const qty = Math.max(1, parseInt(document.getElementById('juice-amount').value) || 1);
+      showSummary(drink ? drink.value : 'Juice', base, 0, qty, [], lines, drink !== null && size !== null);
     }
   }
 
-  function showSummary(drinkName, base, addons, addonNames, lines, hasBase) {
+  function showSummary(drinkName, base, addons, qty, addonNames, lines, hasBase) {
     const drinkEl   = document.getElementById('summaryDrink');
     const linesEl   = document.getElementById('summaryLines');
     const priceBlock = document.getElementById('priceBlock');
@@ -878,6 +876,10 @@
     linesEl.innerHTML = lines.map(([k,v]) =>
       `<div class="summary-line"><span>${k}</span><span>${v}</span></div>`
     ).join('');
+
+    if (qty > 1) {
+      linesEl.innerHTML += `<div class="summary-line"><span>Quantity</span><span>${qty}</span></div>`;
+    }
 
     if (addonNames.length) {
       linesEl.innerHTML += `<div class="summary-line"><span>Extras</span><span style="text-align:right;max-width:180px">${addonNames.join(', ')}</span></div>`;
@@ -896,20 +898,17 @@
         addonsRow.style.display = 'none';
       }
 
-      document.getElementById('priceTotal').textContent = '$' + (base + addons).toFixed(2);
+      document.getElementById('priceTotal').textContent = '$' + ((base + addons) * qty).toFixed(2) + (qty > 1 ? ' (' + qty + ' × $' + (base + addons).toFixed(2) + ')' : '');
     } else {
       priceBlock.style.display = 'none';
     }
   }
 
-  function syncAmount(inputId, val) {
-    const el = document.getElementById(inputId);
-    if (el && val > 0) el.value = val.toFixed(2);
-    else if (el) el.value = '';
-  }
-
   // Live update
   document.addEventListener('change', e => {
+    if (e.target.closest('.page.active')) updateSummary();
+  });
+  document.addEventListener('input', e => {
     if (e.target.closest('.page.active')) updateSummary();
   });
 
@@ -942,6 +941,7 @@
       const temp = document.querySelector('input[name="coffee-temp"]:checked');
       const pay  = document.querySelector('input[name="coffee-payment"]:checked');
       if (!size || !temp || !pay) { showToast('Please select size, temperature, and payment'); return; }
+      const qty = Math.max(1, parseInt(document.getElementById('coffee-amount').value) || 1);
       payload.size = size.value;
       payload.temp = temp.value;
       payload.payment = pay.value;
@@ -949,28 +949,42 @@
       payload.syrups = [...document.querySelectorAll('#page-coffee input[id^="csy-"]:checked')].map(e=>e.value);
       payload.milk   = [...document.querySelectorAll('#page-coffee input[id^="cm-"]:checked')].map(e=>e.value);
       payload.sweeteners = [...document.querySelectorAll('#page-coffee input[id^="csw-"]:checked')].map(e=>e.value);
-      payload.total  = parseFloat(document.getElementById('coffee-amount').value) || 0;
+      const sizeUpcharge = SIZE_UPCHARGE[size.value] || 0;
+      let unitPrice = COFFEE_BASE + sizeUpcharge;
+      payload.syrups.forEach(() => unitPrice += SYRUP_PRICE);
+      if (document.getElementById('csw-foam')?.checked) unitPrice += FOAM_PRICE;
+      payload.amount = qty;
+      payload.total  = Math.round(unitPrice * qty * 100) / 100;
     } else if (p === 'tea') {
       const teas = [...document.querySelectorAll('#page-tea input[id^="tt-"]:checked')];
       const size = document.querySelector('input[name="tea-size"]:checked');
       const pay  = document.querySelector('input[name="tea-payment"]:checked');
       if (!teas.length || !size || !pay) { showToast('Please select tea type, size, and payment'); return; }
+      const qty = Math.max(1, parseInt(document.getElementById('tea-amount').value) || 1);
       payload.teas    = teas.map(e=>e.value);
       payload.size    = size.value;
       payload.payment = pay.value;
       payload.delivery = document.querySelector('input[name="tea-delivery"]:checked')?.value || '';
       payload.additions = [...document.querySelectorAll('#page-tea input[id^="ta-"]:checked')].map(e=>e.value);
-      payload.total   = parseFloat(document.getElementById('tea-amount').value) || 0;
+      let unitPrice = 0;
+      teas.forEach(el => unitPrice += TEA_BASE[el.value] || 2.00);
+      unitPrice += SIZE_UPCHARGE[size.value] || 0;
+      if (document.getElementById('ta-honey')?.checked) unitPrice += HONEY_PRICE;
+      payload.amount = qty;
+      payload.total  = Math.round(unitPrice * qty * 100) / 100;
     } else {
       const drink = document.querySelector('input[name="juice-drink"]:checked');
       const size  = document.querySelector('input[name="juice-size"]:checked');
       const pay   = document.querySelector('input[name="juice-payment"]:checked');
       if (!drink || !size || !pay) { showToast('Please select a drink, size, and payment'); return; }
+      const qty = Math.max(1, parseInt(document.getElementById('juice-amount').value) || 1);
       payload.drink   = drink.value;
       payload.size    = size.value;
       payload.payment = pay.value;
       payload.delivery = document.querySelector('input[name="juice-delivery"]:checked')?.value || '';
-      payload.total   = parseFloat(document.getElementById('juice-amount').value) || 0;
+      const unitPrice = (JUICE_BASE[drink.value] || 2.00) + (SIZE_UPCHARGE[size.value] || 0);
+      payload.amount = qty;
+      payload.total  = Math.round(unitPrice * qty * 100) / 100;
     }
 
     const btn = document.getElementById('submitBtn');
