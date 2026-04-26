@@ -1,3 +1,5 @@
+import htmlContent from './index.html';
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -8,7 +10,11 @@ export default {
     if (method === 'POST' && pathname === '/api/order') return handleOrder(request, env);
     if (method === 'GET'  && pathname === '/api/orders') return handleGetOrders(env);
 
-    return new Response('Not found', { status: 404 });
+    // Serve the imported HTML file
+    return new Response(htmlContent, {
+      status: 200,
+      headers: { 'Content-Type': 'text/html;charset=UTF-8' }
+    });
   }
 };
 
