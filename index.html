@@ -877,6 +877,10 @@
       `<div class="summary-line"><span>${k}</span><span>${v}</span></div>`
     ).join('');
 
+    if (qty > 1) {
+      linesEl.innerHTML += `<div class="summary-line"><span>Quantity</span><span>${qty}</span></div>`;
+    }
+
     if (addonNames.length) {
       linesEl.innerHTML += `<div class="summary-line"><span>Extras</span><span style="text-align:right;max-width:180px">${addonNames.join(', ')}</span></div>`;
     }
@@ -902,6 +906,9 @@
 
   // Live update
   document.addEventListener('change', e => {
+    if (e.target.closest('.page.active')) updateSummary();
+  });
+  document.addEventListener('input', e => {
     if (e.target.closest('.page.active')) updateSummary();
   });
 
