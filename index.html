@@ -29,7 +29,6 @@
       min-height: 100vh;
     }
 
-    /* ── Header ── */
     header {
       padding: 1.6rem 2.5rem;
       border-bottom: 1px solid var(--border);
@@ -70,14 +69,12 @@
     .tab:hover { background: rgba(26,23,20,0.04); color: var(--ink); }
     .tab.active { background: var(--accent); color: white; }
 
-    /* ── Layout ── */
     .layout {
       display: grid;
       grid-template-columns: 1fr 360px;
       min-height: calc(100vh - 65px);
     }
 
-    /* ── Form panel ── */
     .form-panel {
       padding: 2.5rem;
       border-right: 1px solid var(--border);
@@ -94,7 +91,6 @@
       margin-bottom: 2rem;
     }
 
-    /* ── Field groups ── */
     .fields-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -132,14 +128,12 @@
 
     .field-textarea { resize: vertical; min-height: 80px; }
 
-    /* ── Divider ── */
     .divider {
       border: none;
       border-top: 1px solid var(--border);
       margin: 2rem 0;
     }
 
-    /* ── Option sections ── */
     .options-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -157,7 +151,6 @@
 
     .option-list { display: flex; flex-direction: column; gap: 0.45rem; }
 
-    /* radio / checkbox rows */
     .opt { display: none; }
 
     .opt-label {
@@ -185,10 +178,8 @@
       transition: background 0.1s, border-color 0.1s;
     }
 
-    /* radio = circle */
     .opt-box.round { border-radius: 50%; }
 
-    /* checked states */
     .opt:checked + .opt-label .opt-box {
       background: var(--accent);
       border-color: var(--accent);
@@ -200,13 +191,11 @@
       background: white;
     }
 
-    /* checkbox checkmark */
     input[type="checkbox"].opt:checked + .opt-label .opt-box::after {
       width: 8px;
       height: 8px;
     }
 
-    /* radio dot */
     input[type="radio"].opt:checked + .opt-label .opt-box::after {
       width: 6px;
       height: 6px;
@@ -215,14 +204,12 @@
 
     .opt:checked + .opt-label { color: var(--ink); font-weight: 500; }
 
-    /* price hint */
     .price-hint {
       font-size: 0.7rem;
       color: var(--ink-faint);
       margin-left: auto;
     }
 
-    /* ── Summary panel ── */
     .summary-panel {
       display: flex;
       flex-direction: column;
@@ -266,7 +253,6 @@
 
     .summary-line { display: flex; justify-content: space-between; }
 
-    /* price breakdown */
     .price-block {
       border-top: 1px solid var(--border);
       padding-top: 1rem;
@@ -291,7 +277,6 @@
       border-top: 1px solid var(--border);
     }
 
-    /* submit area */
     .submit-area {
       padding: 1.25rem 1.75rem 1.75rem;
       border-top: 1px solid var(--border);
@@ -316,7 +301,6 @@
     .submit-btn:hover { background: var(--accent-hover); }
     .submit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* ── Confirm screen ── */
     .confirm-overlay {
       display: none;
       position: fixed;
@@ -383,7 +367,6 @@
 
     .new-order-btn:hover { background: rgba(26,23,20,0.05); }
 
-    /* ── Toast ── */
     .toast {
       position: fixed;
       bottom: 1.5rem;
@@ -401,7 +384,6 @@
 
     .toast.show { opacity: 1; }
 
-    /* validation error */
     .field-input.error,
     .field-textarea.error { border-color: #b03020; }
 
@@ -459,587 +441,9 @@
         <div>
           <div class="option-group-label">Cup Size <span style="color:#b03020">*</span></div>
           <div class="option-list">
-            <input type="radio" name="coffee-size" id="cs-12" value="12 oz" class="opt" data-price="0">
+            <input type="radio" name="coffee-size" id="cs-12" value="12 oz" class="opt">
             <label for="cs-12" class="opt-label"><span class="opt-box round"></span>12 oz</label>
-            <input type="radio" name="coffee-size" id="cs-16" value="16 oz" class="opt" data-price="0.50">
-            <label for="cs-16" class="opt-label"><span class="opt-box round"></span>16 oz<span class="price-hint">+$0.50</span></label>
-            <input type="radio" name="coffee-size" id="cs-20" value="20 oz" class="opt" data-price="1.00">
-            <label for="cs-20" class="opt-label"><span class="opt-box round"></span>20 oz<span class="price-hint">+$1.00</span></label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Hot or Iced? <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="coffee-temp" id="ct-hot" value="Hot" class="opt">
-            <label for="ct-hot" class="opt-label"><span class="opt-box round"></span>Hot</label>
-            <input type="radio" name="coffee-temp" id="ct-iced" value="Iced" class="opt">
-            <label for="ct-iced" class="opt-label"><span class="opt-box round"></span>Iced</label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Milk</div>
-          <div class="option-list">
-            <input type="checkbox" id="cm-oat" value="Oat milk" class="opt" data-price="0.50">
-            <label for="cm-oat" class="opt-label"><span class="opt-box"></span>Oat milk<span class="price-hint">+$0.50</span></label>
-            <input type="checkbox" id="cm-2pct" value="2% milk" class="opt" data-price="0">
-            <label for="cm-2pct" class="opt-label"><span class="opt-box"></span>2% milk</label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Syrups</div>
-          <div class="option-list">
-            <input type="checkbox" id="csy-caramel" value="Classic Caramel" class="opt" data-price="0.50">
-            <label for="csy-caramel" class="opt-label"><span class="opt-box"></span>Classic Caramel<span class="price-hint">+$0.50</span></label>
-            <input type="checkbox" id="csy-hazelnut" value="Classic Hazelnut" class="opt" data-price="0.50">
-            <label for="csy-hazelnut" class="opt-label"><span class="opt-box"></span>Classic Hazelnut<span class="price-hint">+$0.50</span></label>
-            <input type="checkbox" id="csy-vanilla" value="Vanilla" class="opt" data-price="0.50">
-            <label for="csy-vanilla" class="opt-label"><span class="opt-box"></span>Vanilla<span class="price-hint">+$0.50</span></label>
-            <input type="checkbox" id="csy-frenchvanilla" value="French Vanilla" class="opt" data-price="0.50">
-            <label for="csy-frenchvanilla" class="opt-label"><span class="opt-box"></span>French Vanilla<span class="price-hint">+$0.50</span></label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Sweeteners</div>
-          <div class="option-list">
-            <input type="checkbox" id="csw-vanilamate" value="Vanilla Coffeemate" class="opt" data-price="0">
-            <label for="csw-vanilamate" class="opt-label"><span class="opt-box"></span>Vanilla Coffeemate</label>
-            <input type="checkbox" id="csw-hazmate" value="Hazelnut Coffeemate" class="opt" data-price="0">
-            <label for="csw-hazmate" class="opt-label"><span class="opt-box"></span>Hazelnut Coffeemate</label>
-            <input type="checkbox" id="csw-sugar" value="Granulated Sugar Packets" class="opt" data-price="0">
-            <label for="csw-sugar" class="opt-label"><span class="opt-box"></span>Granulated Sugar Packets</label>
-            <input type="checkbox" id="csw-truvia" value="Truvia Packets" class="opt" data-price="0">
-            <label for="csw-truvia" class="opt-label"><span class="opt-box"></span>Truvia Packets</label>
-            <input type="checkbox" id="csw-foam" value="Milk Foam" class="opt" data-price="0.50">
-            <label for="csw-foam" class="opt-label"><span class="opt-box"></span>Milk Foam<span class="price-hint">+$0.50</span></label>
-          </div>
-        </div>
-
-      </div>
-
-      <hr class="divider">
-
-      <div class="options-grid">
-        <div>
-          <div class="option-group-label">Payment <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="coffee-payment" id="cp-cash" value="Cash" class="opt">
-            <label for="cp-cash" class="opt-label"><span class="opt-box round"></span>Cash</label>
-            <input type="radio" name="coffee-payment" id="cp-cashapp" value="Cashapp" class="opt">
-            <label for="cp-cashapp" class="opt-label"><span class="opt-box round"></span>Cashapp</label>
-          </div>
-        </div>
-        <div>
-          <div class="option-group-label">Delivery <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="coffee-delivery" id="cd-pickup" value="Pickup" class="opt" disabled>
-            <label for="cd-pickup" class="opt-label" style="opacity:0.4"><span class="opt-box round"></span>Pickup (unavailable)</label>
-            <input type="radio" name="coffee-delivery" id="cd-delivery" value="Delivery" class="opt">
-            <label for="cd-delivery" class="opt-label"><span class="opt-box round"></span>Delivery</label>
-          </div>
-        </div>
-        <div>
-          <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="coffee-amount" type="number" min="1" step="1" value="1" style="margin-top:0.1rem">
-        </div>
-      </div>
-    </div>
-
-    <div class="page" id="page-tea">
-      <div class="page-title">Tea</div>
-
-      <div class="fields-grid">
-        <div class="field">
-          <div class="field-label">Name <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="tea-name" type="text">
-        </div>
-        <div class="field">
-          <div class="field-label">Email Address <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="tea-email" type="email">
-        </div>
-        <div class="field">
-          <div class="field-label">Room Number or Area <span style="color:#b03020">*</span></div>
-          <textarea class="field-textarea" id="tea-room" rows="3"></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Additional Requests</div>
-          <textarea class="field-textarea" id="tea-notes" rows="3"></textarea>
-        </div>
-      </div>
-
-      <hr class="divider">
-
-      <div class="options-grid">
-
-        <div>
-          <div class="option-group-label">Type of Tea <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="checkbox" id="tt-raspberry" value="Raspberry Zinger" class="opt" data-price="2.00">
-            <label for="tt-raspberry" class="opt-label"><span class="opt-box"></span>Raspberry Zinger</label>
-            <input type="checkbox" id="tt-earlgrey" value="Earl Grey" class="opt" data-price="2.00">
-            <label for="tt-earlgrey" class="opt-label"><span class="opt-box"></span>Earl Grey</label>
-            <input type="checkbox" id="tt-english" value="English Breakfast" class="opt" data-price="2.00">
-            <label for="tt-english" class="opt-label"><span class="opt-box"></span>English Breakfast</label>
-            <input type="checkbox" id="tt-green" value="Green Tea" class="opt" data-price="2.00">
-            <label for="tt-green" class="opt-label"><span class="opt-box"></span>Green Tea</label>
-            <input type="checkbox" id="tt-chai" value="Chai Latte" class="opt" data-price="2.50">
-            <label for="tt-chai" class="opt-label"><span class="opt-box"></span>Chai Latte<span class="price-hint">$2.50</span></label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Cup Size <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="tea-size" id="ts-12" value="12 oz" class="opt" data-price="0">
-            <label for="ts-12" class="opt-label"><span class="opt-box round"></span>12 oz</label>
-            <input type="radio" name="tea-size" id="ts-16" value="16 oz" class="opt" data-price="0.50">
-            <label for="ts-16" class="opt-label"><span class="opt-box round"></span>16 oz<span class="price-hint">+$0.50</span></label>
-            <input type="radio" name="tea-size" id="ts-20" value="20 oz" class="opt" data-price="1.00">
-            <label for="ts-20" class="opt-label"><span class="opt-box round"></span>20 oz<span class="price-hint">+$1.00</span></label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Additions</div>
-          <div class="option-list">
-            <input type="checkbox" id="ta-honey" value="Honey" class="opt" data-price="0.25">
-            <label for="ta-honey" class="opt-label"><span class="opt-box"></span>Honey<span class="price-hint">+$0.25</span></label>
-            <input type="checkbox" id="ta-truvia" value="Truvia Packets" class="opt" data-price="0">
-            <label for="ta-truvia" class="opt-label"><span class="opt-box"></span>Truvia Packets</label>
-            <input type="checkbox" id="ta-sugar" value="Granulated Sugar Packets" class="opt" data-price="0">
-            <label for="ta-sugar" class="opt-label"><span class="opt-box"></span>Granulated Sugar Packets</label>
-          </div>
-        </div>
-
-      </div>
-
-      <hr class="divider">
-
-      <div class="options-grid">
-        <div>
-          <div class="option-group-label">Payment <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="tea-payment" id="tp-cash" value="Cash" class="opt">
-            <label for="tp-cash" class="opt-label"><span class="opt-box round"></span>Cash</label>
-            <input type="radio" name="tea-payment" id="tp-cashapp" value="Cashapp" class="opt">
-            <label for="tp-cashapp" class="opt-label"><span class="opt-box round"></span>Cashapp</label>
-          </div>
-        </div>
-        <div>
-          <div class="option-group-label">Delivery <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="tea-delivery" id="td-pickup" value="Pickup" class="opt" disabled>
-            <label for="td-pickup" class="opt-label" style="opacity:0.4"><span class="opt-box round"></span>Pickup (unavailable)</label>
-            <input type="radio" name="tea-delivery" id="td-delivery" value="Delivery" class="opt">
-            <label for="td-delivery" class="opt-label"><span class="opt-box round"></span>Delivery</label>
-          </div>
-        </div>
-        <div>
-          <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="tea-amount" type="number" min="1" step="1" value="1" style="margin-top:0.1rem">
-        </div>
-      </div>
-    </div>
-
-    <div class="page" id="page-juice">
-      <div class="page-title">Juice</div>
-
-      <div class="fields-grid">
-        <div class="field">
-          <div class="field-label">Name <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="juice-name" type="text">
-        </div>
-        <div class="field">
-          <div class="field-label">Email Address <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="juice-email" type="email">
-        </div>
-        <div class="field">
-          <div class="field-label">Room Number or Area <span style="color:#b03020">*</span></div>
-          <textarea class="field-textarea" id="juice-room" rows="3"></textarea>
-        </div>
-        <div class="field">
-          <div class="field-label">Additional Requests</div>
-          <textarea class="field-textarea" id="juice-notes" rows="3"></textarea>
-        </div>
-      </div>
-
-      <hr class="divider">
-
-      <div class="options-grid">
-
-        <div>
-          <div class="option-group-label">Type of Drink <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="juice-drink" id="jd-cranmango" value="Cran-Mango Juice" class="opt" data-price="2.50">
-            <label for="jd-cranmango" class="opt-label"><span class="opt-box round"></span>Cran-Mango Juice</label>
-            <input type="radio" name="juice-drink" id="jd-lemonade" value="Lemonade" class="opt" data-price="2.00">
-            <label for="jd-lemonade" class="opt-label"><span class="opt-box round"></span>Lemonade</label>
-            <input type="radio" name="juice-drink" id="jd-arizona" value="Arizona Green Tea" class="opt" data-price="2.00">
-            <label for="jd-arizona" class="opt-label"><span class="opt-box round"></span>Arizona Green Tea</label>
-            <input type="radio" name="juice-drink" id="jd-pineapple" value="Dried Pineapple" class="opt" data-price="1.50">
-            <label for="jd-pineapple" class="opt-label"><span class="opt-box round"></span>Dried Pineapple</label>
-          </div>
-        </div>
-
-        <div>
-          <div class="option-group-label">Cup Size <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="juice-size" id="js-12" value="12 oz" class="opt" data-price="0">
-            <label for="js-12" class="opt-label"><span class="opt-box round"></span>12 oz</label>
-            <input type="radio" name="juice-size" id="js-16" value="16 oz" class="opt" data-price="0.50">
-            <label for="js-16" class="opt-label"><span class="opt-box round"></span>16 oz<span class="price-hint">+$0.50</span></label>
-            <input type="radio" name="juice-size" id="js-20" value="20 oz" class="opt" data-price="1.00">
-            <label for="js-20" class="opt-label"><span class="opt-box round"></span>20 oz<span class="price-hint">+$1.00</span></label>
-          </div>
-        </div>
-
-      </div>
-
-      <hr class="divider">
-
-      <div class="options-grid">
-        <div>
-          <div class="option-group-label">Payment <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="juice-payment" id="jp-cash" value="Cash" class="opt">
-            <label for="jp-cash" class="opt-label"><span class="opt-box round"></span>Cash</label>
-            <input type="radio" name="juice-payment" id="jp-cashapp" value="Cashapp" class="opt">
-            <label for="jp-cashapp" class="opt-label"><span class="opt-box round"></span>Cashapp</label>
-          </div>
-        </div>
-        <div>
-          <div class="option-group-label">Delivery <span style="color:#b03020">*</span></div>
-          <div class="option-list">
-            <input type="radio" name="juice-delivery" id="jdl-pickup" value="Pickup" class="opt" disabled>
-            <label for="jdl-pickup" class="opt-label" style="opacity:0.4"><span class="opt-box round"></span>Pickup (unavailable)</label>
-            <input type="radio" name="juice-delivery" id="jdl-delivery" value="Delivery" class="opt">
-            <label for="jdl-delivery" class="opt-label"><span class="opt-box round"></span>Delivery</label>
-          </div>
-        </div>
-        <div>
-          <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="juice-amount" type="number" min="1" step="1" value="1" style="margin-top:0.1rem">
-        </div>
-      </div>
-    </div>
-
-  </div><div class="summary-panel">
-    <div class="summary-inner">
-      <div class="summary-label">Order summary</div>
-      <div class="summary-drink" id="summaryDrink" style="color:var(--ink-faint);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:300">Fill in the form to see your total</div>
-      <div class="summary-lines" id="summaryLines"></div>
-      <div class="price-block" id="priceBlock" style="display:none">
-        <div class="price-row" id="priceBase"><span>Base</span><span>—</span></div>
-        <div class="price-row" id="priceSizeUpgrade" style="display:none"><span>Size upgrade</span><span id="priceSizeAmt">—</span></div>
-        <div class="price-row" id="priceAddons" style="display:none"><span id="priceAddonsLabel">Add-ons</span><span id="priceAddonsAmt">—</span></div>
-        <div class="price-total">
-          <span>Total</span>
-          <span id="priceTotal">—</span>
-        </div>
-      </div>
-    </div>
-    <div class="submit-area">
-      <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Place order</button>
-    </div>
-  </div>
-
-</div><div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <div class="confirm-title">Order placed</div>
-    <div class="confirm-detail" id="confirmDetail"></div>
-    <div class="confirm-total" id="confirmTotal"></div>
-    <div class="confirm-queue" id="confirmQueue"></div>
-    <button class="new-order-btn" onclick="closeConfirm()">Place another order</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-  // ── Page switching ────────────────────────────────────────────────────────
-  let currentPage = 'coffee';
-
-  function switchPage(page, tabEl) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
-    tabEl.classList.add('active');
-    currentPage = page;
-    updateSummary();
-  }
-
-  // ── Price tables ──────────────────────────────────────────────────────────
-  const COFFEE_BASE = 2.50; // 12oz base
-  const TEA_BASE    = { 'Raspberry Zinger':2.00,'Earl Grey':2.00,'English Breakfast':2.00,'Green Tea':2.00,'Chai Latte':2.50 };
-  const JUICE_BASE  = { 'Cran-Mango Juice':2.50,'Lemonade':2.00,'Arizona Green Tea':2.00,'Dried Pineapple':1.50 };
-  const SIZE_UPCHARGE = { '12 oz': 0, '16 oz': 0.50, '20 oz': 1.00 };
-  const SYRUP_PRICE = 0.50;
-  const FOAM_PRICE  = 0.50;
-  const HONEY_PRICE = 0.25;
-
-  // ── Live summary ──────────────────────────────────────────────────────────
-  function updateSummary() {
-    const p = currentPage;
-    let base = 0, addons = 0, addonNames = [], lines = [];
-
-    if (p === 'coffee') {
-      const size = document.querySelector('input[name="coffee-size"]:checked');
-      const temp = document.querySelector('input[name="coffee-temp"]:checked');
-      const sizeUpcharge = size ? SIZE_UPCHARGE[size.value] : 0;
-      base = COFFEE_BASE + sizeUpcharge;
-
-      // syrups
-      document.querySelectorAll('#page-coffee input[id^="csy-"]:checked').forEach(el => {
-        addons += SYRUP_PRICE; addonNames.push(el.value);
-      });
-      // milks & foam with prices
-      if (document.getElementById('cm-oat')?.checked) {
-        addons += 0.50; addonNames.push('Oat milk');
-      }
-      if (document.getElementById('csw-foam')?.checked) {
-        addons += FOAM_PRICE; addonNames.push('Milk Foam');
-      }
-      // free sweeteners & milk
-      ['csw-vanilamate','csw-hazmate','csw-sugar','csw-truvia'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el?.checked) addonNames.push(el.value);
-      });
-      ['cm-2pct'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el?.checked) addonNames.push(el.value);
-      });
-
-      if (size) lines.push(['Size', size.value]);
-      if (temp) lines.push(['Temp', temp.value]);
-
-      const qty = Math.max(1, parseInt(document.getElementById('coffee-amount').value) || 1);
-      showSummary('Coffee', base, addons, qty, addonNames, lines, size !== null);
-
-    } else if (p === 'tea') {
-      const teas = [...document.querySelectorAll('#page-tea input[id^="tt-"]:checked')];
-      const size = document.querySelector('input[name="tea-size"]:checked');
-      const sizeUpcharge = size ? SIZE_UPCHARGE[size.value] : 0;
-
-      teas.forEach(el => {
-        base += TEA_BASE[el.value] || 2.00;
-      });
-
-      if (document.getElementById('ta-honey')?.checked) {
-        addons += HONEY_PRICE; addonNames.push('Honey');
-      }
-      ['ta-truvia','ta-sugar'].forEach(id => {
-        if (document.getElementById(id)?.checked) addonNames.push(document.getElementById(id).value);
-      });
-
-      const baseWithSize = base > 0 ? base + sizeUpcharge : 0;
-      const drinkLabel = teas.length ? teas.map(t => t.value).join(', ') : 'Tea';
-
-      if (size) lines.push(['Size', size.value]);
-
-      const qty = Math.max(1, parseInt(document.getElementById('tea-amount').value) || 1);
-      showSummary(drinkLabel, baseWithSize, addons, qty, addonNames, lines, teas.length > 0 && size !== null);
-
-    } else if (p === 'juice') {
-      const drink = document.querySelector('input[name="juice-drink"]:checked');
-      const size  = document.querySelector('input[name="juice-size"]:checked');
-      const sizeUpcharge = size ? SIZE_UPCHARGE[size.value] : 0;
-
-      if (drink) base = (JUICE_BASE[drink.value] || 2.00) + sizeUpcharge;
-      if (size) lines.push(['Size', size.value]);
-
-      const qty = Math.max(1, parseInt(document.getElementById('juice-amount').value) || 1);
-      showSummary(drink ? drink.value : 'Juice', base, 0, qty, [], lines, drink !== null && size !== null);
-    }
-  }
-
-  function showSummary(drinkName, base, addons, qty, addonNames, lines, hasBase) {
-    const drinkEl   = document.getElementById('summaryDrink');
-    const linesEl   = document.getElementById('summaryLines');
-    const priceBlock = document.getElementById('priceBlock');
-
-    drinkEl.style.fontFamily = "'DM Serif Display', serif";
-    drinkEl.style.fontSize = '1.25rem';
-    drinkEl.style.color = 'var(--ink)';
-    drinkEl.style.fontWeight = '400';
-    drinkEl.textContent = drinkName;
-
-    linesEl.innerHTML = lines.map(([k,v]) =>
-      `<div class="summary-line"><span>${k}</span><span>${v}</span></div>`
-    ).join('');
-
-    if (qty > 1) {
-      linesEl.innerHTML += `<div class="summary-line"><span>Quantity</span><span>${qty}</span></div>`;
-    }
-
-    if (addonNames.length) {
-      linesEl.innerHTML += `<div class="summary-line"><span>Extras</span><span style="text-align:right;max-width:180px">${addonNames.join(', ')}</span></div>`;
-    }
-
-    if (hasBase) {
-      priceBlock.style.display = 'flex';
-      document.getElementById('priceBase').children[1].textContent = '$' + base.toFixed(2);
-      document.getElementById('priceSizeUpgrade').style.display = 'none';
-
-      const addonsRow = document.getElementById('priceAddons');
-      if (addons > 0) {
-        addonsRow.style.display = 'flex';
-        document.getElementById('priceAddonsAmt').textContent = '+$' + addons.toFixed(2);
-      } else {
-        addonsRow.style.display = 'none';
-      }
-
-      document.getElementById('priceTotal').textContent = '$' + ((base + addons) * qty).toFixed(2) + (qty > 1 ? ' (' + qty + ' × $' + (base + addons).toFixed(2) + ')' : '');
-    } else {
-      priceBlock.style.display = 'none';
-    }
-  }
-
-  // Live update
-  document.addEventListener('change', e => {
-    if (e.target.closest('.page.active')) updateSummary();
-  });
-  document.addEventListener('input', e => {
-    if (e.target.closest('.page.active')) updateSummary();
-  });
-
-  // ── Submit ────────────────────────────────────────────────────────────────
-  async function submitOrder() {
-    const p = currentPage;
-    const nameEl  = document.getElementById(p + '-name');
-    const emailEl = document.getElementById(p + '-email');
-    const roomEl  = document.getElementById(p + '-room');
-
-    let valid = true;
-    [nameEl, emailEl, roomEl].forEach(el => {
-      el.classList.remove('error');
-      if (!el.value.trim()) { el.classList.add('error'); valid = false; }
-    });
-
-    if (!valid) { showToast('Please fill in all required fields'); return; }
-
-    // Build payload
-    const payload = {
-      category: p,
-      name: nameEl.value.trim(),
-      email: emailEl.value.trim(),
-      room: roomEl.value.trim(),
-      notes: document.getElementById(p + '-notes').value.trim(),
-    };
-
-    if (p === 'coffee') {
-      const size = document.querySelector('input[name="coffee-size"]:checked');
-      const temp = document.querySelector('input[name="coffee-temp"]:checked');
-      const pay  = document.querySelector('input[name="coffee-payment"]:checked');
-      if (!size || !temp || !pay) { showToast('Please select size, temperature, and payment'); return; }
-      
-      const qty = Math.max(1, parseInt(document.getElementById('coffee-amount').value) || 1);
-      payload.size = size.value;
-      payload.temp = temp.value;
-      payload.payment = pay.value;
-      payload.delivery = document.querySelector('input[name="coffee-delivery"]:checked')?.value || '';
-      payload.syrups = [...document.querySelectorAll('#page-coffee input[id^="csy-"]:checked')].map(e=>e.value);
-      payload.milk   = [...document.querySelectorAll('#page-coffee input[id^="cm-"]:checked')].map(e=>e.value);
-      payload.sweeteners = [...document.querySelectorAll('#page-coffee input[id^="csw-"]:checked')].map(e=>e.value);
-      
-      const sizeUpcharge = SIZE_UPCHARGE[size.value] || 0;
-      let unitPrice = COFFEE_BASE + sizeUpcharge;
-      payload.syrups.forEach(() => unitPrice += SYRUP_PRICE);
-      if (document.getElementById('cm-oat')?.checked) unitPrice += 0.50;
-      if (document.getElementById('csw-foam')?.checked) unitPrice += FOAM_PRICE;
-      
-      payload.amount = qty;
-      payload.total  = Math.round(unitPrice * qty * 100) / 100;
-
-    } else if (p === 'tea') {
-      const teas = [...document.querySelectorAll('#page-tea input[id^="tt-"]:checked')];
-      const size = document.querySelector('input[name="tea-size"]:checked');
-      const pay  = document.querySelector('input[name="tea-payment"]:checked');
-      if (!teas.length || !size || !pay) { showToast('Please select tea type, size, and payment'); return; }
-      
-      const qty = Math.max(1, parseInt(document.getElementById('tea-amount').value) || 1);
-      payload.teas    = teas.map(e=>e.value);
-      payload.size    = size.value;
-      payload.payment = pay.value;
-      payload.delivery = document.querySelector('input[name="tea-delivery"]:checked')?.value || '';
-      payload.additions = [...document.querySelectorAll('#page-tea input[id^="ta-"]:checked')].map(e=>e.value);
-      
-      let unitPrice = 0;
-      teas.forEach(el => unitPrice += TEA_BASE[el.value] || 2.00);
-      unitPrice += SIZE_UPCHARGE[size.value] || 0;
-      if (document.getElementById('ta-honey')?.checked) unitPrice += HONEY_PRICE;
-      
-      payload.amount = qty;
-      payload.total  = Math.round(unitPrice * qty * 100) / 100;
-
-    } else {
-      const drink = document.querySelector('input[name="juice-drink"]:checked');
-      const size  = document.querySelector('input[name="juice-size"]:checked');
-      const pay   = document.querySelector('input[name="juice-payment"]:checked');
-      if (!drink || !size || !pay) { showToast('Please select a drink, size, and payment'); return; }
-      
-      const qty = Math.max(1, parseInt(document.getElementById('juice-amount').value) || 1);
-      payload.drink   = drink.value;
-      payload.size    = size.value;
-      payload.payment = pay.value;
-      payload.delivery = document.querySelector('input[name="juice-delivery"]:checked')?.value || '';
-      
-      const unitPrice = (JUICE_BASE[drink.value] || 2.00) + (SIZE_UPCHARGE[size.value] || 0);
-      payload.amount = qty;
-      payload.total  = Math.round(unitPrice * qty * 100) / 100;
-    }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true; btn.textContent = 'Sending\u2026';
-
-    try {
-      const res = await fetch('/api/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-
-      // Build confirm text
-      let detail = `${payload.name} — ${payload.room}\n${payload.email}`;
-      if (p === 'coffee') detail += `\n${payload.amount}x ${payload.size} ${payload.temp} Coffee`;
-      if (p === 'tea')    detail += `\n${payload.amount}x ${payload.teas.join(' + ')} — ${payload.size}`;
-      if (p === 'juice')  detail += `\n${payload.amount}x ${payload.drink} — ${payload.size}`;
-
-      document.getElementById('confirmDetail').textContent = detail;
-      document.getElementById('confirmTotal').textContent = 'Total: $' + payload.total.toFixed(2);
-      document.getElementById('confirmQueue').textContent =
-        data.queuePosition ? 'Queue position #' + data.queuePosition : 'Your order is in the queue';
-
-      document.getElementById('confirmOverlay').classList.add('active');
-
-    } catch {
-      showToast('Something went wrong \u2014 please try again');
-    } finally {
-      btn.disabled = false; btn.textContent = 'Place order';
-    }
-  }
-
-  function closeConfirm() {
-    document.getElementById('confirmOverlay').classList.remove('active');
-    // Reset current page form
-    document.querySelectorAll('#page-' + currentPage + ' .field-input, #page-' + currentPage + ' .field-textarea')
-      .forEach(el => el.value = '');
-    document.querySelectorAll('#page-' + currentPage + ' .opt:checked')
-      .forEach(el => el.checked = false);
-    document.getElementById(currentPage + '-amount').value = 1;
-    updateSummary();
-  }
-
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3200);
-  }
-</script>
-</body>
-</html>
+            <input type="radio" name="coffee-size" id="cs-16" value="16 oz" class="opt">
+            <label for="cs-16" class="opt-label"><span class="opt-box round"></span>16 oz<span class="price-hint">+$1.00</span></label>
+            <input type="radio" name="coffee-size" id="cs-20" value="20 oz" class="opt">
+            <label for="cs-20" class="opt-label"><span class="opt-box round"></span>20 oz<span class="price-hint">+$2.00
