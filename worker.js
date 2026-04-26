@@ -42,23 +42,24 @@ async function handleOrder(request, env) {
   }
 
   try {
-    const result = await env.DB.prepare(
+    const { meta } = await env.DB.prepare(
       `INSERT INTO orders (name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, amount, total, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
-       RETURNING id`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))`
     )
     .bind(
       name, email, room, notes, item, category, size, temp, milk,
       JSON.stringify(syrups), JSON.stringify(extras),
       payment, delivery, amount, Math.round(total * 100) / 100
     )
-    .first();
+    .run();
+
+    const insertedId = meta.last_row_id;
 
     const queueResult = await env.DB.prepare(
       `SELECT COUNT(*) as count FROM orders WHERE status = 'pending' AND id <= ?`
-    ).bind(result.id).first();
+    ).bind(insertedId).first();
 
-    return cors(json({ success: true, id: result.id, queuePosition: queueResult.count }, 201));
+    return cors(json({ success: true, id: insertedId, queuePosition: queueResult.count }, 201));
   } catch (e) {
     console.error(e);
     return err('Failed to save order', 500);
