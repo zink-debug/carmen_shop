@@ -11,3 +11,6 @@ compatibility_date = "2024-01-01"
 binding = "DB"                  # matches env.DB in worker.js
 database_name = "soaring_hot"
 database_id = "466e8019-e45e-4c7c-93be-ba46b9159bf3"   # from: wrangler d1 create coffee-cart-db
+
+[assets]
+directory = "./public"
