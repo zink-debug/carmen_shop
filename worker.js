@@ -1,4 +1,4 @@
-import htmlContent from './index.html';
+ import htmlContent from './index.html';
 
 export default {
   async fetch(request, env) {
@@ -10,7 +10,6 @@ export default {
     if (method === 'POST' && pathname === '/api/order') return handleOrder(request, env);
     if (method === 'GET'  && pathname === '/api/orders') return handleGetOrders(env);
 
-    // Serve the imported HTML file
     return new Response(htmlContent, {
       status: 200,
       headers: { 'Content-Type': 'text/html;charset=UTF-8' }
@@ -42,18 +41,19 @@ async function handleOrder(request, env) {
   }
 
   try {
-    const { meta } = await env.DB.prepare(
+    const result = await env.DB.prepare(
       `INSERT INTO orders (name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, amount, total, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
+       RETURNING id`
     )
     .bind(
       name, email, room, notes, item, category, size, temp, milk,
       JSON.stringify(syrups), JSON.stringify(extras),
       payment, delivery, amount, Math.round(total * 100) / 100
     )
-    .run();
+    .first();
 
-    const insertedId = meta.last_row_id;
+    const insertedId = result.id;
 
     const queueResult = await env.DB.prepare(
       `SELECT COUNT(*) as count FROM orders WHERE status = 'pending' AND id <= ?`
