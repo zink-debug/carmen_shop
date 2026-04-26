@@ -1,0 +1,12 @@
+name = "coffee-cart"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Static assets — put index.html in a /public folder and uncomment:
+# [site]
+# bucket = "./public"
+
+[[d1_databases]]
+binding = "DB"                  # matches env.DB in worker.js
+database_name = "coffee-cart-db"
+database_id = "PASTE_YOUR_DATABASE_ID_HERE"   # from: wrangler d1 create coffee-cart-db
