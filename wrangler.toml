@@ -9,5 +9,5 @@ compatibility_date = "2024-01-01"
 
 [[d1_databases]]
 binding = "DB"                  # matches env.DB in worker.js
-database_name = "coffee-cart-db"
-database_id = "PASTE_YOUR_DATABASE_ID_HERE"   # from: wrangler d1 create coffee-cart-db
+database_name = "soaring_hot"
+database_id = "466e8019-e45e-4c7c-93be-ba46b9159bf3"   # from: wrangler d1 create coffee-cart-db
