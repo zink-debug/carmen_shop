@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS orders (
   extras     TEXT    NOT NULL DEFAULT '[]',
   payment    TEXT    NOT NULL,
   delivery   TEXT    NOT NULL,
+  amount     INTEGER NOT NULL DEFAULT 1,
   total      REAL    NOT NULL DEFAULT 0,
   status     TEXT    NOT NULL DEFAULT 'pending',
   created_at TEXT    NOT NULL
