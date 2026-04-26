@@ -1,17 +1,3 @@
-/**
- * Coffee Cart — Cloudflare Worker
- *
- * Routes:
- *   POST /api/order    → insert order into D1
- *   GET  /api/orders   → list all orders (staff view)
- *
- * Setup:
- *   1. wrangler d1 create coffee-cart-db
- *   2. Paste the database_id into wrangler.toml
- *   3. wrangler d1 execute coffee-cart-db --file=schema.sql
- *   4. wrangler deploy
- */
-
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -31,30 +17,33 @@ async function handleOrder(request, env) {
   try { body = await request.json(); }
   catch { return err('Invalid JSON', 400); }
 
-  const { name, item, category, size, milk, syrups = [], extras = [], total } = body;
+  const { category, name, email, room, notes = '', size, payment, delivery, total } = body;
 
-  if (!name?.trim())                                        return err('Name required', 400);
-  if (!item || !['Coffee','Juice','Tea'].includes(category?.charAt(0).toUpperCase() + category?.slice(1)))
-    { /* category check is loose — just verify item is a non-empty string */ }
-  if (!item?.trim())                                        return err('Item required', 400);
-  if (!['small','medium','large'].includes(size))           return err('Invalid size', 400);
-  if (typeof total !== 'number' || total < 0)               return err('Invalid total', 400);
+  if (!name || !email || !room) return err('Missing required fields', 400);
+  if (!['12 oz','16 oz','20 oz'].includes(size)) return err('Invalid size', 400);
+
+  let item = 'Coffee';
+  let temp = body.temp || '';
+  let milk = (body.milk || []).join(', ');
+  let syrups = body.syrups || [];
+  let extras = body.sweeteners || body.additions || [];
+
+  if (category === 'tea') {
+    item = (body.teas || []).join(', ');
+  } else if (category === 'juice') {
+    item = body.drink || 'Juice';
+  }
 
   try {
     const result = await env.DB.prepare(
-      `INSERT INTO orders (name, item, category, size, milk, syrups, extras, total, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
+      `INSERT INTO orders (name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, total, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
        RETURNING id`
     )
     .bind(
-      name.trim(),
-      item.trim(),
-      category || '',
-      size,
-      milk || '',
-      JSON.stringify(syrups),
-      JSON.stringify(extras),
-      Math.round(total * 100) / 100
+      name, email, room, notes, item, category, size, temp, milk,
+      JSON.stringify(syrups), JSON.stringify(extras),
+      payment, delivery, Math.round(total * 100) / 100
     )
     .first();
 
@@ -72,7 +61,7 @@ async function handleOrder(request, env) {
 async function handleGetOrders(env) {
   try {
     const { results } = await env.DB.prepare(
-      `SELECT id, name, item, category, size, milk, syrups, extras, total, status, created_at
+      `SELECT id, name, email, room, notes, item, category, size, temp, milk, syrups, extras, payment, delivery, total, status, created_at
        FROM orders ORDER BY created_at DESC LIMIT 200`
     ).all();
 
