@@ -1,17 +1,20 @@
--- schema.sql
--- Run: wrangler d1 execute coffee-cart-db --file=schema.sql
-
 CREATE TABLE IF NOT EXISTS orders (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   name       TEXT    NOT NULL,
+  email      TEXT    NOT NULL,
+  room       TEXT    NOT NULL,
+  notes      TEXT,
   item       TEXT    NOT NULL,
-  category   TEXT    NOT NULL DEFAULT '',
+  category   TEXT    NOT NULL,
   size       TEXT    NOT NULL,
+  temp       TEXT,
   milk       TEXT    NOT NULL DEFAULT '',
-  syrups     TEXT    NOT NULL DEFAULT '[]',   -- JSON array e.g. ["Vanilla","Caramel"]
-  extras     TEXT    NOT NULL DEFAULT '[]',   -- JSON array e.g. ["Chia Seeds"]
+  syrups     TEXT    NOT NULL DEFAULT '[]',
+  extras     TEXT    NOT NULL DEFAULT '[]',
+  payment    TEXT    NOT NULL,
+  delivery   TEXT    NOT NULL,
   total      REAL    NOT NULL DEFAULT 0,
-  status     TEXT    NOT NULL DEFAULT 'pending',  -- pending | ready | done
+  status     TEXT    NOT NULL DEFAULT 'pending',
   created_at TEXT    NOT NULL
 );
 
