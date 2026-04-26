@@ -428,10 +428,8 @@
 
 <div class="layout">
 
-  <!-- ══ FORM PANEL ══ -->
   <div class="form-panel">
 
-    <!-- ── COFFEE ── -->
     <div class="page active" id="page-coffee">
       <div class="page-title">Coffee</div>
 
@@ -483,8 +481,8 @@
         <div>
           <div class="option-group-label">Milk</div>
           <div class="option-list">
-            <input type="checkbox" id="cm-oat" value="Oat milk" class="opt" data-price="0">
-            <label for="cm-oat" class="opt-label"><span class="opt-box"></span>Oat milk</label>
+            <input type="checkbox" id="cm-oat" value="Oat milk" class="opt" data-price="0.50">
+            <label for="cm-oat" class="opt-label"><span class="opt-box"></span>Oat milk<span class="price-hint">+$0.50</span></label>
             <input type="checkbox" id="cm-2pct" value="2% milk" class="opt" data-price="0">
             <label for="cm-2pct" class="opt-label"><span class="opt-box"></span>2% milk</label>
           </div>
@@ -545,12 +543,11 @@
         </div>
         <div>
           <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="coffee-amount" type="number" min="1" step="1" placeholder="1" style="margin-top:0.1rem">
+          <input class="field-input" id="coffee-amount" type="number" min="1" step="1" value="1" style="margin-top:0.1rem">
         </div>
       </div>
     </div>
 
-    <!-- ── TEA ── -->
     <div class="page" id="page-tea">
       <div class="page-title">Tea</div>
 
@@ -642,12 +639,11 @@
         </div>
         <div>
           <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="tea-amount" type="number" min="1" step="1" placeholder="1" style="margin-top:0.1rem">
+          <input class="field-input" id="tea-amount" type="number" min="1" step="1" value="1" style="margin-top:0.1rem">
         </div>
       </div>
     </div>
 
-    <!-- ── JUICE ── -->
     <div class="page" id="page-juice">
       <div class="page-title">Juice</div>
 
@@ -725,15 +721,12 @@
         </div>
         <div>
           <div class="option-group-label">Quantity <span style="color:#b03020">*</span></div>
-          <input class="field-input" id="juice-amount" type="number" min="1" step="1" placeholder="1" style="margin-top:0.1rem">
+          <input class="field-input" id="juice-amount" type="number" min="1" step="1" value="1" style="margin-top:0.1rem">
         </div>
       </div>
     </div>
 
-  </div><!-- /form-panel -->
-
-  <!-- ══ SUMMARY PANEL ══ -->
-  <div class="summary-panel">
+  </div><div class="summary-panel">
     <div class="summary-inner">
       <div class="summary-label">Order summary</div>
       <div class="summary-drink" id="summaryDrink" style="color:var(--ink-faint);font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:300">Fill in the form to see your total</div>
@@ -753,10 +746,7 @@
     </div>
   </div>
 
-</div><!-- /layout -->
-
-<!-- Confirmation overlay -->
-<div class="confirm-overlay" id="confirmOverlay">
+</div><div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-title">Order placed</div>
     <div class="confirm-detail" id="confirmDetail"></div>
@@ -805,16 +795,19 @@
       document.querySelectorAll('#page-coffee input[id^="csy-"]:checked').forEach(el => {
         addons += SYRUP_PRICE; addonNames.push(el.value);
       });
-      // milk foam
+      // milks & foam with prices
+      if (document.getElementById('cm-oat')?.checked) {
+        addons += 0.50; addonNames.push('Oat milk');
+      }
       if (document.getElementById('csw-foam')?.checked) {
         addons += FOAM_PRICE; addonNames.push('Milk Foam');
       }
-      // other sweeteners / milk (no price)
+      // free sweeteners & milk
       ['csw-vanilamate','csw-hazmate','csw-sugar','csw-truvia'].forEach(id => {
         const el = document.getElementById(id);
         if (el?.checked) addonNames.push(el.value);
       });
-      ['cm-oat','cm-2pct'].forEach(id => {
+      ['cm-2pct'].forEach(id => {
         const el = document.getElementById(id);
         if (el?.checked) addonNames.push(el.value);
       });
@@ -941,6 +934,7 @@
       const temp = document.querySelector('input[name="coffee-temp"]:checked');
       const pay  = document.querySelector('input[name="coffee-payment"]:checked');
       if (!size || !temp || !pay) { showToast('Please select size, temperature, and payment'); return; }
+      
       const qty = Math.max(1, parseInt(document.getElementById('coffee-amount').value) || 1);
       payload.size = size.value;
       payload.temp = temp.value;
@@ -949,39 +943,49 @@
       payload.syrups = [...document.querySelectorAll('#page-coffee input[id^="csy-"]:checked')].map(e=>e.value);
       payload.milk   = [...document.querySelectorAll('#page-coffee input[id^="cm-"]:checked')].map(e=>e.value);
       payload.sweeteners = [...document.querySelectorAll('#page-coffee input[id^="csw-"]:checked')].map(e=>e.value);
+      
       const sizeUpcharge = SIZE_UPCHARGE[size.value] || 0;
       let unitPrice = COFFEE_BASE + sizeUpcharge;
       payload.syrups.forEach(() => unitPrice += SYRUP_PRICE);
+      if (document.getElementById('cm-oat')?.checked) unitPrice += 0.50;
       if (document.getElementById('csw-foam')?.checked) unitPrice += FOAM_PRICE;
+      
       payload.amount = qty;
       payload.total  = Math.round(unitPrice * qty * 100) / 100;
+
     } else if (p === 'tea') {
       const teas = [...document.querySelectorAll('#page-tea input[id^="tt-"]:checked')];
       const size = document.querySelector('input[name="tea-size"]:checked');
       const pay  = document.querySelector('input[name="tea-payment"]:checked');
       if (!teas.length || !size || !pay) { showToast('Please select tea type, size, and payment'); return; }
+      
       const qty = Math.max(1, parseInt(document.getElementById('tea-amount').value) || 1);
       payload.teas    = teas.map(e=>e.value);
       payload.size    = size.value;
       payload.payment = pay.value;
       payload.delivery = document.querySelector('input[name="tea-delivery"]:checked')?.value || '';
       payload.additions = [...document.querySelectorAll('#page-tea input[id^="ta-"]:checked')].map(e=>e.value);
+      
       let unitPrice = 0;
       teas.forEach(el => unitPrice += TEA_BASE[el.value] || 2.00);
       unitPrice += SIZE_UPCHARGE[size.value] || 0;
       if (document.getElementById('ta-honey')?.checked) unitPrice += HONEY_PRICE;
+      
       payload.amount = qty;
       payload.total  = Math.round(unitPrice * qty * 100) / 100;
+
     } else {
       const drink = document.querySelector('input[name="juice-drink"]:checked');
       const size  = document.querySelector('input[name="juice-size"]:checked');
       const pay   = document.querySelector('input[name="juice-payment"]:checked');
       if (!drink || !size || !pay) { showToast('Please select a drink, size, and payment'); return; }
+      
       const qty = Math.max(1, parseInt(document.getElementById('juice-amount').value) || 1);
       payload.drink   = drink.value;
       payload.size    = size.value;
       payload.payment = pay.value;
       payload.delivery = document.querySelector('input[name="juice-delivery"]:checked')?.value || '';
+      
       const unitPrice = (JUICE_BASE[drink.value] || 2.00) + (SIZE_UPCHARGE[size.value] || 0);
       payload.amount = qty;
       payload.total  = Math.round(unitPrice * qty * 100) / 100;
@@ -1001,9 +1005,9 @@
 
       // Build confirm text
       let detail = `${payload.name} — ${payload.room}\n${payload.email}`;
-      if (p === 'coffee') detail += `\n${payload.size} ${payload.temp} Coffee`;
-      if (p === 'tea')    detail += `\n${payload.teas.join(' + ')} — ${payload.size}`;
-      if (p === 'juice')  detail += `\n${payload.drink} — ${payload.size}`;
+      if (p === 'coffee') detail += `\n${payload.amount}x ${payload.size} ${payload.temp} Coffee`;
+      if (p === 'tea')    detail += `\n${payload.amount}x ${payload.teas.join(' + ')} — ${payload.size}`;
+      if (p === 'juice')  detail += `\n${payload.amount}x ${payload.drink} — ${payload.size}`;
 
       document.getElementById('confirmDetail').textContent = detail;
       document.getElementById('confirmTotal').textContent = 'Total: $' + payload.total.toFixed(2);
@@ -1026,6 +1030,7 @@
       .forEach(el => el.value = '');
     document.querySelectorAll('#page-' + currentPage + ' .opt:checked')
       .forEach(el => el.checked = false);
+    document.getElementById(currentPage + '-amount').value = 1;
     updateSummary();
   }
 
