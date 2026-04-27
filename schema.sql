@@ -27,7 +27,7 @@ CREATE INDEX IF NOT EXISTS idx_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_created_at ON orders(created_at);
 
 -- Default admin password is 'admin'. Change this from the admin panel later!
-INSERT INTO store_config (id, data) VALUES ('admin_pass', 'admin');
+INSERT INTO store_config (id, data) VALUES ('admin_pass', 'Ilovepanguins');
 
 -- Default starting menu
 INSERT INTO store_config (id, data) VALUES ('menu', '{"categories":[{"id":"cat_1","name":"Coffee","drinks":[{"id":"d_1","name":"House Roast","price":1.5}],"optionGroups":[{"id":"og_1","name":"Cup Size","type":"radio","choices":[{"id":"c_1","name":"12 oz","price":0},{"id":"c_2","name":"16 oz","price":1}]},{"id":"og_2","name":"Syrups","type":"checkbox","choices":[{"id":"c_3","name":"Vanilla","price":0.5}]}]}]}');
