@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin - Coffee Cart</title>
+  <title>Admin Panel</title>
   <style>
-    body { font-family: monospace; background: #1A1714; color: #FAF8F4; padding: 2rem; max-width: 1000px; margin: auto; }
+    body { font-family: monospace; background: #1A1714; color: #FAF8F4; padding: 1rem; max-width: 1200px; margin: auto; }
     .box { background: #2a2522; padding: 1rem; margin-bottom: 1rem; border: 1px solid #4A4540; }
     input, select, button { background: #1A1714; color: white; border: 1px solid #4A4540; padding: 0.5rem; margin: 0.2rem; }
     button { cursor: pointer; background: #4A4540; }
     button:hover { background: #888078; }
-    .flex { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .flex { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
     .danger { background: #b03020; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
     .order-card { border-left: 5px solid #f1c40f; }
-    .order-card.completed { border-left-color: #4CAF50; opacity: 0.8; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
-  </style>
+    .order-card.completed { border-left-color: #4CAF50; opacity: 0.6; }
+  </small></style>
 </head>
 <body>
 
@@ -32,16 +32,16 @@
         <h2>Live Orders</h2>
         <span id="poll-status" style="color: #4CAF50;">● Live</span>
       </div>
-      <div id="orders-container">Loading orders...</div>
+      <div id="orders-container">Loading...</div>
     </div>
 
     <div>
       <div class="flex" style="justify-content: space-between;">
         <h2>Menu Editor</h2>
-        <button onclick="saveMenu()" style="background: #4CAF50;">SAVE MENU</button>
+        <button onclick="saveMenu()" style="background: #4CAF50; font-weight:bold;">SAVE TO LIVE SITE</button>
       </div>
       <div id="categories-container"></div>
-      <button onclick="addCategory()">+ Add Category</button>
+      <button onclick="addCategory()">+ New Category</button>
     </div>
   </div>
 </div>
@@ -60,9 +60,7 @@
       renderMenu();
       fetchOrders();
       setInterval(fetchOrders, 5000);
-    } else {
-      alert("Invalid password");
-    }
+    } else { alert("Wrong password"); }
   }
 
   async function fetchOrders() {
@@ -70,19 +68,18 @@
     if (res.ok) {
       const orders = await res.json();
       const container = document.getElementById('orders-container');
-      container.innerHTML = orders.length ? '' : 'No orders yet.';
+      container.innerHTML = orders.length ? '' : 'No orders.';
       orders.forEach(o => {
         const div = document.createElement('div');
         div.className = `box order-card ${o.status}`;
         div.innerHTML = `
-          <div class="flex" style="justify-content: space-between;">
-            <strong>${o.name} (Room ${o.room})</strong>
-            <small>${new Date(o.created_at).toLocaleTimeString()}</small>
+          <div class="flex" style="justify-content: space-between;"><strong>${o.name}</strong> <small>${o.room}</small></div>
+          <p>${o.quantity}x ${o.drink} ($${o.total.toFixed(2)})</p>
+          <small style="color:#aaa">${o.options}</small>
+          ${o.notes ? `<p style="color:#d4af37">Note: ${o.notes}</p>` : ''}
+          <div style="margin-top:0.5rem">
+            ${o.status === 'pending' ? `<button onclick="updateStatus(${o.id}, 'completed')">Mark Done</button>` : '✓ Done'}
           </div>
-          <p>${o.quantity}x ${o.drink} - $${o.total.toFixed(2)}</p>
-          <small style="display:block; color:#aaa; margin-bottom:0.5rem;">${o.options}</small>
-          ${o.notes ? `<p style="font-size:0.8rem; color:#d4af37;">Note: ${o.notes}</p>` : ''}
-          ${o.status === 'pending' ? `<button onclick="updateStatus(${o.id}, 'completed')">Done</button>` : '<span>✓</span>'}
         `;
         container.appendChild(div);
       });
@@ -103,22 +100,36 @@
     container.innerHTML = '';
     menu.categories.forEach((cat, cIdx) => {
       let html = `<div class="box">
-        <input type="text" value="${cat.name}" onchange="menu.categories[${cIdx}].name=this.value">
-        <button class="danger" onclick="menu.categories.splice(${cIdx},1);renderMenu()">Del</button>
-        <div style="margin-top:1rem; padding-left:1rem; border-left:1px solid #444;">`;
+        <div class="flex">
+          <input type="text" value="${cat.name}" onchange="menu.categories[${cIdx}].name=this.value">
+          <button class="danger" onclick="menu.categories.splice(${cIdx},1);renderMenu()">Delete</button>
+        </div>
+        <div style="margin-left:1rem; border-left:1px solid #444; padding-left:0.5rem;">
+          <h4>Drinks</h4>`;
       cat.drinks.forEach((d, dIdx) => {
         html += `<div class="flex">
-          <input type="text" value="${d.name}" onchange="menu.categories[${cIdx}].drinks[${dIdx}].name=this.value" placeholder="Drink">
+          <input type="text" value="${d.name}" onchange="menu.categories[${cIdx}].drinks[${dIdx}].name=this.value">
           <input type="number" step="0.1" value="${d.price}" onchange="menu.categories[${cIdx}].drinks[${dIdx}].price=parseFloat(this.value)" style="width:60px">
           <button onclick="menu.categories[${cIdx}].drinks.splice(${dIdx},1);renderMenu()">x</button>
         </div>`;
       });
-      html += `<button onclick="menu.categories[${cIdx}].drinks.push({id:Date.now(),name:'New',price:0});renderMenu()">+ Drink</button></div></div>`;
+      html += `<button onclick="menu.categories[${cIdx}].drinks.push({id:''+Math.random(),name:'New',price:0});renderMenu()">+ Drink</button>
+          <h4 style="margin-top:1rem">Options (Sizes/Syrups)</h4>`;
+      
+      if(!cat.optionGroups) cat.optionGroups = [];
+      cat.optionGroups.forEach((og, ogIdx) => {
+        html += `<div style="background:#1A1714; padding:5px; margin-bottom:5px;">
+          <input type="text" value="${og.name}" onchange="menu.categories[${cIdx}].optionGroups[${ogIdx}].name=this.value" placeholder="Group Name">
+          <button onclick="menu.categories[${cIdx}].optionGroups.splice(${ogIdx},1);renderMenu()">x</button>
+        </div>`;
+      });
+      html += `<button onclick="menu.categories[${cIdx}].optionGroups.push({id:''+Math.random(),name:'Size',type:'radio',choices:[]});renderMenu()">+ Option Group</button>
+        </div></div>`;
       container.innerHTML += html;
     });
   }
 
-  function addCategory() { menu.categories.push({ id: Date.now(), name: "New", drinks: [], optionGroups: [] }); renderMenu(); }
+  function addCategory() { menu.categories.push({ id: ''+Math.random(), name: "New Category", drinks: [], optionGroups: [] }); renderMenu(); }
 
   async function saveMenu() {
     const res = await fetch('/api/menu', {
@@ -126,7 +137,7 @@
       headers: { 'Authorization': password, 'Content-Type': 'application/json' },
       body: JSON.stringify(menu)
     });
-    if (res.ok) alert("Saved!");
+    if (res.ok) alert("Menu Updated!");
   }
 </script>
 </body>
