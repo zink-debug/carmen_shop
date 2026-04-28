@@ -4,40 +4,51 @@
   <meta charset="UTF-8">
   <title>Admin - Coffee Cart</title>
   <style>
-    body { font-family: monospace; background: #1A1714; color: #FAF8F4; padding: 2rem; max-width: 900px; margin: auto; }
+    body { font-family: monospace; background: #1A1714; color: #FAF8F4; padding: 2rem; max-width: 1000px; margin: auto; }
     .box { background: #2a2522; padding: 1rem; margin-bottom: 1rem; border: 1px solid #4A4540; }
     input, select, button { background: #1A1714; color: white; border: 1px solid #4A4540; padding: 0.5rem; margin: 0.2rem; }
     button { cursor: pointer; background: #4A4540; }
     button:hover { background: #888078; }
     .flex { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-    h2, h3, h4 { margin-top: 0; }
-    #auth-screen { text-align: center; margin-top: 20vh; }
     .danger { background: #b03020; }
+    .order-card { border-left: 5px solid #f1c40f; }
+    .order-card.completed { border-left-color: #4CAF50; opacity: 0.8; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-<div id="auth-screen">
+<div id="auth-screen" style="text-align: center; margin-top: 20vh;">
   <h2>Admin Access</h2>
   <input type="password" id="admin-pass" placeholder="Password">
   <button onclick="login()">Enter</button>
 </div>
 
-<div id="editor-screen" style="display:none">
-  <div class="flex" style="justify-content: space-between; margin-bottom: 2rem;">
-    <h2>Menu Editor</h2>
-    <button onclick="saveMenu()" style="background: #4CAF50; padding: 0.5rem 2rem; font-weight: bold;">SAVE LIVE MENU</button>
+<div id="main-interface" style="display:none">
+  <div class="grid">
+    <div>
+      <div class="flex" style="justify-content: space-between;">
+        <h2>Live Orders</h2>
+        <span id="poll-status" style="color: #4CAF50;">● Live</span>
+      </div>
+      <div id="orders-container">Loading orders...</div>
+    </div>
+
+    <div>
+      <div class="flex" style="justify-content: space-between;">
+        <h2>Menu Editor</h2>
+        <button onclick="saveMenu()" style="background: #4CAF50;">SAVE MENU</button>
+      </div>
+      <div id="categories-container"></div>
+      <button onclick="addCategory()">+ Add Category</button>
+    </div>
   </div>
-  
-  <div id="categories-container"></div>
-  <button onclick="addCategory()">+ Add New Category Tab</button>
 </div>
 
 <script>
   let password = '';
   let menu = { categories: [] };
-
-  function generateId() { return Math.random().toString(36).substr(2, 9); }
 
   async function login() {
     password = document.getElementById('admin-pass').value;
@@ -45,85 +56,69 @@
     if (res.ok) {
       menu = await res.json();
       document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('editor-screen').style.display = 'block';
-      render();
+      document.getElementById('main-interface').style.display = 'block';
+      renderMenu();
+      fetchOrders();
+      setInterval(fetchOrders, 5000);
+    } else {
+      alert("Invalid password");
     }
   }
 
-  function render() {
+  async function fetchOrders() {
+    const res = await fetch('/api/orders', { headers: { 'Authorization': password } });
+    if (res.ok) {
+      const orders = await res.json();
+      const container = document.getElementById('orders-container');
+      container.innerHTML = orders.length ? '' : 'No orders yet.';
+      orders.forEach(o => {
+        const div = document.createElement('div');
+        div.className = `box order-card ${o.status}`;
+        div.innerHTML = `
+          <div class="flex" style="justify-content: space-between;">
+            <strong>${o.name} (Room ${o.room})</strong>
+            <small>${new Date(o.created_at).toLocaleTimeString()}</small>
+          </div>
+          <p>${o.quantity}x ${o.drink} - $${o.total.toFixed(2)}</p>
+          <small style="display:block; color:#aaa; margin-bottom:0.5rem;">${o.options}</small>
+          ${o.notes ? `<p style="font-size:0.8rem; color:#d4af37;">Note: ${o.notes}</p>` : ''}
+          ${o.status === 'pending' ? `<button onclick="updateStatus(${o.id}, 'completed')">Done</button>` : '<span>✓</span>'}
+        `;
+        container.appendChild(div);
+      });
+    }
+  }
+
+  async function updateStatus(id, status) {
+    await fetch('/api/order-status', {
+      method: 'POST',
+      headers: { 'Authorization': password, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status })
+    });
+    fetchOrders();
+  }
+
+  function renderMenu() {
     const container = document.getElementById('categories-container');
     container.innerHTML = '';
-
     menu.categories.forEach((cat, cIdx) => {
       let html = `<div class="box">
-        <div class="flex">
-          <h3>Category:</h3>
-          <input type="text" value="${cat.name}" onchange="update(${cIdx}, 'name', this.value)">
-          <button class="danger" onclick="delCat(${cIdx})">Delete Category</button>
-        </div>
-        
-        <div style="margin-left: 2rem; border-left: 2px solid #4A4540; padding-left: 1rem;">
-          <h4>Drinks in ${cat.name}</h4>`;
-          
+        <input type="text" value="${cat.name}" onchange="menu.categories[${cIdx}].name=this.value">
+        <button class="danger" onclick="menu.categories.splice(${cIdx},1);renderMenu()">Del</button>
+        <div style="margin-top:1rem; padding-left:1rem; border-left:1px solid #444;">`;
       cat.drinks.forEach((d, dIdx) => {
-        html += `<div class="flex" style="margin-bottom:0.5rem">
-          <input type="text" value="${d.name}" placeholder="Drink Name" onchange="updateDrink(${cIdx}, ${dIdx}, 'name', this.value)">
-          <input type="number" step="0.10" value="${d.price}" placeholder="Price" onchange="updateDrink(${cIdx}, ${dIdx}, 'price', this.value)">
-          <button class="danger" onclick="delDrink(${cIdx}, ${dIdx})">X</button>
+        html += `<div class="flex">
+          <input type="text" value="${d.name}" onchange="menu.categories[${cIdx}].drinks[${dIdx}].name=this.value" placeholder="Drink">
+          <input type="number" step="0.1" value="${d.price}" onchange="menu.categories[${cIdx}].drinks[${dIdx}].price=parseFloat(this.value)" style="width:60px">
+          <button onclick="menu.categories[${cIdx}].drinks.splice(${dIdx},1);renderMenu()">x</button>
         </div>`;
       });
-      html += `<button onclick="addDrink(${cIdx})">+ Add Drink</button>
-      
-        <h4 style="margin-top:2rem;">Option Groups (Sizes, Syrups, etc)</h4>`;
-
-      cat.optionGroups.forEach((og, ogIdx) => {
-        html += `<div class="box" style="background:#1A1714">
-          <div class="flex">
-            <input type="text" value="${og.name}" placeholder="Group Name" onchange="updateGroup(${cIdx}, ${ogIdx}, 'name', this.value)">
-            <select onchange="updateGroup(${cIdx}, ${ogIdx}, 'type', this.value)">
-              <option value="radio" ${og.type==='radio'?'selected':''}>Pick One (Radio)</option>
-              <option value="checkbox" ${og.type==='checkbox'?'selected':''}>Pick Multiple (Checkbox)</option>
-            </select>
-            <button class="danger" onclick="delGroup(${cIdx}, ${ogIdx})">Del Group</button>
-          </div>
-          <div style="margin-left: 1rem; margin-top: 1rem;">`;
-          
-          og.choices.forEach((ch, chIdx) => {
-            html += `<div class="flex" style="margin-bottom:0.5rem">
-              <input type="text" value="${ch.name}" placeholder="Option Name" onchange="updateChoice(${cIdx}, ${ogIdx}, ${chIdx}, 'name', this.value)">
-              <input type="number" step="0.10" value="${ch.price}" placeholder="Extra Cost" onchange="updateChoice(${cIdx}, ${ogIdx}, ${chIdx}, 'price', this.value)">
-              <button class="danger" onclick="delChoice(${cIdx}, ${ogIdx}, ${chIdx})">X</button>
-            </div>`;
-          });
-
-        html += `<button onclick="addChoice(${cIdx}, ${ogIdx})">+ Add Option</button>
-          </div></div>`;
-      });
-
-      html += `<button onclick="addGroup(${cIdx})">+ Add Option Group</button>
-        </div></div>`;
-      
+      html += `<button onclick="menu.categories[${cIdx}].drinks.push({id:Date.now(),name:'New',price:0});renderMenu()">+ Drink</button></div></div>`;
       container.innerHTML += html;
     });
   }
 
-  // Data Manipulation Functions
-  function update(c, k, v) { menu.categories[c][k] = v; }
-  function updateDrink(c, d, k, v) { menu.categories[c].drinks[d][k] = k==='price'?parseFloat(v):v; }
-  function updateGroup(c, g, k, v) { menu.categories[c].optionGroups[g][k] = v; }
-  function updateChoice(c, g, ch, k, v) { menu.categories[c].optionGroups[g].choices[ch][k] = k==='price'?parseFloat(v):v; }
-
-  function addCategory() { menu.categories.push({ id: generateId(), name: "New Tab", drinks: [], optionGroups: [] }); render(); }
-  function delCat(c) { menu.categories.splice(c, 1); render(); }
-  
-  function addDrink(c) { menu.categories[c].drinks.push({ id: generateId(), name: "New Drink", price: 0 }); render(); }
-  function delDrink(c, d) { menu.categories[c].drinks.splice(d, 1); render(); }
-
-  function addGroup(c) { menu.categories[c].optionGroups.push({ id: generateId(), name: "New Group", type: "radio", choices: [] }); render(); }
-  function delGroup(c, g) { menu.categories[c].optionGroups.splice(g, 1); render(); }
-
-  function addChoice(c, g) { menu.categories[c].optionGroups[g].choices.push({ id: generateId(), name: "Option", price: 0 }); render(); }
-  function delChoice(c, g, ch) { menu.categories[c].optionGroups[g].choices.splice(ch, 1); render(); }
+  function addCategory() { menu.categories.push({ id: Date.now(), name: "New", drinks: [], optionGroups: [] }); renderMenu(); }
 
   async function saveMenu() {
     const res = await fetch('/api/menu', {
@@ -131,8 +126,7 @@
       headers: { 'Authorization': password, 'Content-Type': 'application/json' },
       body: JSON.stringify(menu)
     });
-    if (res.ok) alert("Menu Saved Successfully to Live Database!");
-    else alert("Failed to save. Did you type the wrong password?");
+    if (res.ok) alert("Saved!");
   }
 </script>
 </body>
