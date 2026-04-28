@@ -18,8 +18,6 @@ export default {
     if (method === 'GET' && pathname === '/api/menu') return handleGetMenu(env);
     if (method === 'POST' && pathname === '/api/menu') return handleSaveMenu(request, env);
     if (method === 'POST' && pathname === '/api/order') return handleOrder(request, env);
-    
-    // New Order Management Routes
     if (method === 'GET' && pathname === '/api/orders') return handleGetOrders(request, env);
     if (method === 'POST' && pathname === '/api/order-status') return handleUpdateOrderStatus(request, env);
 
@@ -37,7 +35,7 @@ async function handleGetMenu(env) {
 async function handleSaveMenu(request, env) {
   const auth = request.headers.get('Authorization');
   const pass = await env.DB.prepare("SELECT data FROM store_config WHERE id = 'admin_pass'").first();
-  if (auth !== pass.data) return cors(json({ success: false, error: 'Invalid password' }, 401));
+  if (auth !== pass.data) return cors(json({ success: false, error: 'Unauthorized' }, 401));
 
   const body = await request.text();
   await env.DB.prepare("UPDATE store_config SET data = ? WHERE id = 'menu'").bind(body).run();
@@ -64,30 +62,27 @@ async function handleUpdateOrderStatus(request, env) {
 }
 
 async function handleOrder(request, env) {
-  let body;
-  try { body = await request.json(); } catch { return err('Invalid JSON', 400); }
-  const { name, email, room, notes = '', category, drink, options, quantity, total } = body;
-
   try {
+    const body = await request.json();
+    const { name, email, room, notes = '', category, drink, options, quantity, total } = body;
+
     const result = await env.DB.prepare(
       `INSERT INTO orders (name, email, room, notes, category, drink, options, quantity, total, status, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
        RETURNING id`
     )
-    .bind(name, email, room, notes, category, drink, JSON.stringify(options), quantity, Math.round(total * 100) / 100)
+    .bind(name, email, room, notes, category, drink, typeof options === 'string' ? options : JSON.stringify(options), quantity, Math.round(total * 100) / 100)
     .first();
+
     return cors(json({ success: true, id: result.id }, 201));
   } catch (e) {
-    return err('Failed to save order', 500);
+    console.error("Order Error:", e.message);
+    return cors(json({ success: false, error: e.message }, 500));
   }
 }
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
-}
-
-function err(message, status = 400) {
-  return cors(json({ success: false, error: message }, status));
 }
 
 function cors(res) {
